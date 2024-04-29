@@ -46,8 +46,10 @@ export async function upgradeContact(id, data) {
     return null;
   }
 
-  contacts[index] = { id, ...data };
+  const updContact = { ...contacts[index], ...data };
+  contacts[index] = updContact;
+
   await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
 
-  return contacts[index];
+  return updContact;
 }

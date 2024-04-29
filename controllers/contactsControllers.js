@@ -47,7 +47,7 @@ export const createContact = async (req, res, next) => {
     const { name, email, phone } = req.body;
     const { error } = createContactSchema.validate({ name, email, phone });
     if (typeof error !== "undefined") {
-      return res.status(400).json({ message: "Filds must be filled" });
+      return res.status(400).json({ message: error.message });
     }
     const newContact = await addContact(name, email, phone);
     res.status(201).json(newContact);
@@ -57,7 +57,6 @@ export const createContact = async (req, res, next) => {
 };
 
 export const updateContact = async (req, res, next) => {
-  console.log(req.body.length);
   try {
     if (Object.keys(req.body).length === 0) {
       return res
@@ -77,7 +76,7 @@ export const updateContact = async (req, res, next) => {
       res.status(404).json({ message: "Not found" });
     }
 
-    res.status(201).json(contactUpdate);
+    res.status(200).json(contactUpdate);
   } catch (error) {
     next(error);
   }
