@@ -8,13 +8,26 @@ import {
   getContactById,
   listContacts,
   removeContact,
-  upgradeContact,
+  // upgradeContact,
 } from "../services/contactsServices.js";
 
 export const getAllContacts = async (_, res, next) => {
   try {
-    const allContacts = await listContacts();
-    res.status(200).json(allContacts);
+    const result = await listContacts();
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createContact = async (req, res, next) => {
+  try {
+    const { error } = createContactSchema.validate(req.body);
+    if (typeof error !== "undefined") {
+      return res.status(400).json({ message: error.message });
+    }
+    const newContact = await addContact(req.body);
+    res.status(201).json(newContact);
   } catch (error) {
     next(error);
   }
@@ -31,26 +44,16 @@ export const getOneContact = async (req, res) => {
   }
 };
 
-export const deleteContact = async (req, res) => {
+export const deleteContact = async (req, res, next) => {
   const { id } = req.params;
-  const deleteOneContact = await removeContact(id);
-
-  if (deleteOneContact) {
-    res.status(200).json(deleteOneContact);
-  } else {
-    res.status(404).json({ message: "Not found" });
-  }
-};
-
-export const createContact = async (req, res, next) => {
   try {
-    const { name, email, phone } = req.body;
-    const { error } = createContactSchema.validate({ name, email, phone });
-    if (typeof error !== "undefined") {
-      return res.status(400).json({ message: error.message });
+    const deleteOneContact = await removeContact(id);
+
+    if (deleteOneContact) {
+      res.status(200).json(deleteOneContact);
+    } else {
+      res.status(404).json({ message: "Not found" });
     }
-    const newContact = await addContact(name, email, phone);
-    res.status(201).json(newContact);
   } catch (error) {
     next(error);
   }

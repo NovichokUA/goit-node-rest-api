@@ -6,16 +6,17 @@ import {
   createContact,
   updateContact,
 } from "../controllers/contactsControllers.js";
+import { validateId } from "../middlewares/validareId.js";
 
 const contactsRouter = express.Router();
 
 contactsRouter.get("/", getAllContacts);
 
+contactsRouter.post("/", createContact);
+
 contactsRouter.get("/:id", getOneContact);
 
-contactsRouter.delete("/:id", deleteContact);
-
-contactsRouter.post("/", createContact);
+contactsRouter.delete("/:id", validateId, deleteContact);
 
 contactsRouter.put("/:id", updateContact);
 
