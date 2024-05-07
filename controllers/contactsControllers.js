@@ -1,4 +1,5 @@
 import HttpError from "../helpers/HttpError.js";
+import { wrapperError } from "../helpers/Wrapper.js";
 
 import {
   addContact,
@@ -9,34 +10,32 @@ import {
   upgradeStatusContact,
 } from "../services/contactsServices.js";
 
-export const getAllContacts = async (_, res) => {
+export const getAllContacts = wrapperError(async (_, res) => {
   const result = await listContacts();
 
-  if (result) {
-    res.status(200).json(result);
-  } else {
-    res.status(404).json({ message: "Not found" });
+  if (!result) {
+    throw HttpError(404);
   }
-};
+  res.json(result);
+});
 
-export const createContact = async (req, res) => {
+export const createContact = wrapperError(async (req, res) => {
   const { body } = req;
   const result = await addContact(body);
   res.status(201).json(result);
-};
+});
 
-export const getOneContact = async (req, res) => {
+export const getOneContact = wrapperError(async (req, res) => {
   const { id } = req.params;
   const result = await getContactById(id);
 
-  if (result) {
-    res.status(200).json(result);
-  } else {
-    res.status(404).json({ message: "Not found" });
+  if (!result) {
+    throw HttpError(404);
   }
-};
+  res.json(result);
+});
 
-export const deleteContact = async (req, res) => {
+export const deleteContact = wrapperError(async (req, res) => {
   const { id } = req.params;
   const result = await removeContact(id);
 
@@ -44,9 +43,9 @@ export const deleteContact = async (req, res) => {
     throw HttpError(404);
   }
   res.json(result);
-};
+});
 
-export const updateContact = async (req, res) => {
+export const updateContact = wrapperError(async (req, res) => {
   const { id } = req.params;
   const { body } = req;
   const result = await upgradeContact(id, body, { new: true });
@@ -55,9 +54,9 @@ export const updateContact = async (req, res) => {
     throw HttpError(404);
   }
   res.json(result);
-};
+});
 
-export const updateStatusContact = async (req, res) => {
+export const updateStatusContact = wrapperError(async (req, res) => {
   const { id } = req.params;
   const { favorite } = req.body;
   const result = await upgradeStatusContact(id, favorite);
@@ -67,4 +66,4 @@ export const updateStatusContact = async (req, res) => {
   }
 
   res.json(result);
-};
+});
