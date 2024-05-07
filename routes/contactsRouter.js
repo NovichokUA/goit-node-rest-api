@@ -37,7 +37,7 @@ contactsRouter.put(
 );
 
 contactsRouter.patch(
-  "/:id/favorites",
+  "/:id/favorite",
   validateId,
   validateBody(updateFavoriteSchema),
   updateStatusContact

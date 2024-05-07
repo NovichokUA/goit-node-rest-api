@@ -48,22 +48,28 @@ export const deleteContact = wrapperError(async (req, res) => {
 export const updateContact = wrapperError(async (req, res) => {
   const { id } = req.params;
   const { body } = req;
+
   const result = await upgradeContact(id, body, { new: true });
 
   if (!result) {
     throw HttpError(404);
   }
-  res.json(result);
+
+  const newContact = await getContactById(id);
+
+  res.json(newContact);
 });
 
 export const updateStatusContact = wrapperError(async (req, res) => {
   const { id } = req.params;
   const { favorite } = req.body;
-  const result = await upgradeStatusContact(id, favorite);
+  const result = await upgradeStatusContact(id, { favorite }, { new: true });
 
   if (!result) {
     throw HttpError(404);
   }
 
-  res.json(result);
+  const newStatusContact = await getContactById(id);
+
+  res.json(newStatusContact);
 });
