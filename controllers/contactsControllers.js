@@ -10,8 +10,10 @@ import {
   upgradeStatusContact,
 } from "../services/contactsServices.js";
 
-export const getAllContacts = wrapperError(async (_, res) => {
-  const result = await listContacts();
+export const getAllContacts = wrapperError(async (req, res) => {
+  const ownerId = req.user.id;
+
+  const result = await listContacts({ owner: ownerId });
 
   if (!result) {
     throw HttpError(404);
@@ -20,8 +22,16 @@ export const getAllContacts = wrapperError(async (_, res) => {
 });
 
 export const createContact = wrapperError(async (req, res) => {
-  const { body } = req;
-  const result = await addContact(body);
+  const newContact = {
+    name: req.body.name,
+    email: req.body.email,
+    phone: req.body.phone,
+    favorite: req.body.favorite,
+    owner: req.user.id,
+  };
+
+  // const { body } = req;
+  const result = await addContact(newContact);
   res.status(201).json(result);
 });
 

@@ -1,6 +1,6 @@
 import Contact from "../db/models/Contact.js";
 
-export const listContacts = () => Contact.find();
+export const listContacts = (id) => Contact.find(id);
 
 export const addContact = (dataContact) => Contact.create(dataContact);
 
