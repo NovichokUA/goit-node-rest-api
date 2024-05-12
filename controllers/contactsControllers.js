@@ -42,6 +42,11 @@ export const getOneContact = wrapperError(async (req, res) => {
   if (!result) {
     throw HttpError(404);
   }
+
+  if (result.owner.toString() !== req.user.id) {
+    throw HttpError(404);
+  }
+
   res.json(result);
 });
 
