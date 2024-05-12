@@ -1,6 +1,8 @@
 import jwt, { decode } from "jsonwebtoken";
 
-function auth(req, res, next) {
+import User from "../db/models/User.js";
+
+const auth = async (req, res, next) => {
   const authurizationHeader = req.headers.authorization;
 
   if (typeof authurizationHeader === "undefined") {
@@ -13,20 +15,34 @@ function auth(req, res, next) {
     return res.status(401).json("Not authorized");
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decode) => {
     if (err) {
       return res.status(401).json("Not authorized");
     }
 
-    console.log(decode);
+    try {
+      const user = await User.findById(decode.id);
 
-    req.user = {
-      id: decode.id,
-      name: decode.name,
-    };
+      if (user === null) {
+        return res.status(401).json("Not authorized");
+      }
 
-    next();
+      if (user.token !== token) {
+        return res.status(401).json("Not authorized");
+      }
+
+      req.user = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        subscription: user.subscription,
+      };
+
+      next();
+    } catch (error) {
+      next(error);
+    }
   });
-}
+};
 
 export default auth;

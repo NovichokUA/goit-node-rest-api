@@ -1,7 +1,13 @@
 import express from "express";
-import { login, register } from "../controllers/authControllers.js";
+import {
+  getCurrentUser,
+  login,
+  logout,
+  register,
+} from "../controllers/authControllers.js";
 import validateBody from "../helpers/validateBody.js";
 import { createUserSchema } from "../schemas/userSchema.js";
+import auth from "../middlewares/auth.js";
 
 const authRouter = express.Router();
 const jsonParser = express.json();
@@ -14,5 +20,9 @@ authRouter.post(
 );
 
 authRouter.post("/login", jsonParser, login);
+
+authRouter.get("/logout", auth, logout);
+
+authRouter.get("/current", auth, getCurrentUser);
 
 export default authRouter;

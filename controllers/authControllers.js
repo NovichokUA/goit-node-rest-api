@@ -2,7 +2,7 @@ import User from "../db/models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export async function register(req, res, next) {
+export const register = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -29,9 +29,9 @@ export async function register(req, res, next) {
   } catch (error) {
     next(error);
   }
-}
+};
 
-export async function login(req, res, next) {
+export const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -53,6 +53,8 @@ export async function login(req, res, next) {
       { expiresIn: "2 days" }
     );
 
+    await User.findByIdAndUpdate(user._id, { token });
+
     res.status(200).json({
       token,
       user: {
@@ -63,4 +65,23 @@ export async function login(req, res, next) {
   } catch (error) {
     next(error);
   }
-}
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, { token: null });
+
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCurrentUser = async (req, res) => {
+  const { email, subscription } = req.user;
+
+  res.status(200).json({
+    email,
+    subscription,
+  });
+};
