@@ -13,7 +13,11 @@ import {
 export const getAllContacts = wrapperError(async (req, res) => {
   const ownerId = req.user.id;
 
-  const result = await listContacts({ owner: ownerId });
+  const { page = 1, limit = 20 } = req.query;
+
+  const skip = (page - 1) * limit;
+
+  const result = await listContacts({ owner: ownerId }).skip(skip).limit(limit);
 
   if (!result) {
     throw HttpError(404);
