@@ -15,7 +15,7 @@ app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
 
-app.use("/api", routes);
+app.use("/", routes);
 
 app.use((_, res) => {
   res.status(404).json({ message: "Route not found" });

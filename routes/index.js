@@ -8,7 +8,7 @@ import authMiddelware from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.use("/contacts", authMiddelware, contactsRouter);
+router.use("/api/contacts", authMiddelware, contactsRouter);
 router.use("/users", authRouter);
 
 export default router;

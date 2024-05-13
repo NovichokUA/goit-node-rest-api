@@ -9,7 +9,7 @@ export const register = async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (user !== null) {
-      return res.status(409).json("Email in use");
+      return res.status(409).json({ message: "Email in use" });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -38,13 +38,13 @@ export const login = async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (user === null) {
-      return res.status(401).json("Email or password is wrong");
+      return res.status(401).json({ message: "Email or password is wrong" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (isMatch === false) {
-      return res.status(401).json("Email or password is wrong");
+      return res.status(401).json({ message: "Email or password is wrong" });
     }
 
     const token = jwt.sign(
