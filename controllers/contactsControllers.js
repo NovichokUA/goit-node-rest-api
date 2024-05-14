@@ -41,13 +41,18 @@ export const createContact = wrapperError(async (req, res) => {
 
 export const getOneContact = wrapperError(async (req, res) => {
   const { id } = req.params;
+
   const result = await getContactById(id);
 
   if (!result) {
     throw HttpError(404);
   }
 
-  if (result.owner.toString() !== req.user.id) {
+  // if (result.owner.toString() !== req.user.id.toString()) {
+  //   throw HttpError(404);
+  // }
+
+  if (!req.user.id.equals(result.owner)) {
     throw HttpError(404);
   }
 
