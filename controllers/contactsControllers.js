@@ -1,5 +1,6 @@
 import HttpError from "../helpers/HttpError.js";
 import { wrapperError } from "../helpers/Wrapper.js";
+import { owner } from "../helpers/validateOwner.js";
 
 import {
   addContact,
@@ -40,6 +41,8 @@ export const createContact = wrapperError(async (req, res) => {
 });
 
 export const getOneContact = wrapperError(async (req, res) => {
+  await owner(req);
+
   const { id } = req.params;
 
   const result = await getContactById(id);
@@ -52,30 +55,32 @@ export const getOneContact = wrapperError(async (req, res) => {
   //   throw HttpError(404);
   // }
 
-  if (!req.user.id.equals(result.owner)) {
-    throw HttpError(404);
-  }
-
   res.json(result);
 });
 
 export const deleteContact = wrapperError(async (req, res) => {
-  const { id } = req.params;
-  const result = await removeContact(id);
+  await owner(req);
 
-  if (!result) {
+  const { id } = req.params;
+
+  const contact = await removeContact(id);
+
+  if (!contact) {
     throw HttpError(404);
   }
-  res.json(result);
+
+  res.json(contact);
 });
 
 export const updateContact = wrapperError(async (req, res) => {
+  await owner(req);
+
   const { id } = req.params;
   const { body } = req;
 
-  const result = await upgradeContact(id, body, { new: true });
+  const contact = await upgradeContact(id, body, { new: true });
 
-  if (!result) {
+  if (!contact) {
     throw HttpError(404);
   }
 
@@ -85,8 +90,11 @@ export const updateContact = wrapperError(async (req, res) => {
 });
 
 export const updateStatusContact = wrapperError(async (req, res) => {
+  await owner(req);
+
   const { id } = req.params;
   const { favorite } = req.body;
+
   const result = await upgradeStatusContact(id, { favorite }, { new: true });
 
   if (!result) {
