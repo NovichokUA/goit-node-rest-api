@@ -4,9 +4,6 @@ import cors from "cors";
 
 import routes from "./routes/index.js";
 
-import contactsRouter from "./routes/contactsRouter.js";
-import authRouter from "./routes/authRouter.js";
-
 import "dotenv/config";
 
 const app = express();
