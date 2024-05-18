@@ -5,6 +5,7 @@ import gravatar from "gravatar";
 import { getGlobals } from "common-es";
 import * as path from "path";
 import * as fs from "fs/promises";
+import Jimp from "jimp";
 
 const { __dirname } = getGlobals(import.meta.url);
 
@@ -105,6 +106,15 @@ export const updateAvatar = async (req, res) => {
   const filename = `${id}_${originalname}`;
 
   const resultUpload = path.join(avatarDir, filename);
+
+  const img = await Jimp.read(tempUpload);
+
+  await img
+    .autocrop()
+    .cover(250, 250, Jimp.HORIZONTAL_ALIGN_CENTER || Jimp.VERTICAL_ALIGN_MIDDLE)
+    .writeAsync(tempUpload);
+
+  console.log(img);
 
   await fs.rename(tempUpload, resultUpload);
 
