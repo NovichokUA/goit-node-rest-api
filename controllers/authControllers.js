@@ -1,6 +1,15 @@
 import User from "../db/models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import gravatar from "gravatar";
+import { getGlobals } from "common-es";
+import * as path from "path";
+import * as fs from "fs/promises";
+import Jimp from "jimp";
+
+const { __dirname } = getGlobals(import.meta.url);
+
+const avatarDir = path.join(__dirname, "../", "public", "avatars");
 
 export const register = async (req, res, next) => {
   const { email, password } = req.body;
@@ -14,10 +23,13 @@ export const register = async (req, res, next) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const avatarURL = gravatar.url(email);
+
     const result = await User.create({
       ...req.body,
       email,
       password: passwordHash,
+      avatarURL,
     });
 
     res.status(201).json({
@@ -83,5 +95,36 @@ export const getCurrentUser = async (req, res) => {
   res.status(200).json({
     email,
     subscription,
+  });
+};
+
+export const updateAvatar = async (req, res) => {
+  const { id } = req.user;
+
+  const { path: tempUpload, originalname } = req.file;
+
+  const filename = `${id}_${originalname}`;
+
+  const resultUpload = path.join(avatarDir, filename);
+
+  const img = await Jimp.read(tempUpload);
+
+  await img
+    .autocrop()
+    .cover(250, 250, Jimp.HORIZONTAL_ALIGN_CENTER || Jimp.VERTICAL_ALIGN_MIDDLE)
+    .writeAsync(tempUpload);
+
+  console.log(img);
+
+  await fs.rename(tempUpload, resultUpload);
+
+  const avatarURL = path.join("avatars", filename);
+
+  await User.findByIdAndUpdate(id, { avatarURL });
+
+  res.status(200).json({
+    ResponseBody: {
+      avatarURL,
+    },
   });
 };

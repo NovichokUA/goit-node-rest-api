@@ -5,6 +5,7 @@ import {
   login,
   logout,
   register,
+  updateAvatar,
 } from "../controllers/authControllers.js";
 
 import validateBody from "../helpers/validateBody.js";
@@ -12,6 +13,7 @@ import validateBody from "../helpers/validateBody.js";
 import { createUserSchema } from "../schemas/userSchema.js";
 
 import auth from "../middlewares/auth.js";
+import { upload } from "../middlewares/upload.js";
 
 const authRouter = express.Router();
 const jsonParser = express.json();
@@ -28,5 +30,7 @@ authRouter.post("/login", jsonParser, validateBody(createUserSchema), login);
 authRouter.post("/logout", auth, logout);
 
 authRouter.get("/current", auth, getCurrentUser);
+
+authRouter.patch("/avatars", auth, upload.single("avatar"), updateAvatar);
 
 export default authRouter;
