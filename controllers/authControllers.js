@@ -6,6 +6,7 @@ import { getGlobals } from "common-es";
 import * as path from "path";
 import * as fs from "fs/promises";
 import Jimp from "jimp";
+import HttpError from "../helpers/HttpError.js";
 
 const { __dirname } = getGlobals(import.meta.url);
 
@@ -99,6 +100,12 @@ export const getCurrentUser = async (req, res) => {
 };
 
 export const updateAvatar = async (req, res) => {
+  if (!req.file) {
+    return res
+      .status(400)
+      .json({ message: "Please select a file for your avatar and try again." });
+  }
+
   const { id } = req.user;
 
   const { path: tempUpload, originalname } = req.file;
@@ -114,8 +121,6 @@ export const updateAvatar = async (req, res) => {
     .cover(250, 250, Jimp.HORIZONTAL_ALIGN_CENTER || Jimp.VERTICAL_ALIGN_MIDDLE)
     .writeAsync(tempUpload);
 
-  console.log(img);
-
   await fs.rename(tempUpload, resultUpload);
 
   const avatarURL = path.join("avatars", filename);
@@ -123,8 +128,6 @@ export const updateAvatar = async (req, res) => {
   await User.findByIdAndUpdate(id, { avatarURL });
 
   res.status(200).json({
-    ResponseBody: {
-      avatarURL,
-    },
+    avatarURL,
   });
 };
