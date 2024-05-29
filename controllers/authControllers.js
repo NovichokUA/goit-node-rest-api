@@ -7,12 +7,16 @@ import * as path from "path";
 import * as fs from "fs/promises";
 import Jimp from "jimp";
 import HttpError from "../helpers/HttpError.js";
+import { randomUUID } from "crypto";
+import mail from "../mail.js";
 
 const { __dirname } = getGlobals(import.meta.url);
 
 const avatarDir = path.join(__dirname, "../", "public", "avatars");
 
 export const register = async (req, res, next) => {
+  const { META_USERNAME, BASE_URL } = process.env;
+
   const { email, password } = req.body;
 
   try {
@@ -26,12 +30,25 @@ export const register = async (req, res, next) => {
 
     const avatarURL = gravatar.url(email);
 
+    const verificationToken = randomUUID();
+
     const result = await User.create({
       ...req.body,
       email,
       password: passwordHash,
       avatarURL,
+      verificationToken,
     });
+
+    const verifyEmail = {
+      to: email,
+      from: "zubr7333@meta.ua",
+      subject: "Сonfirm your registration",
+      html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click to confirm your registration</a>`,
+      // text: `Сonfirm your registration please open href="http://localhost:8000/users/verify/${verificationToken}`,
+    };
+
+    await mail.sendMail(verifyEmail);
 
     res.status(201).json({
       user: {
