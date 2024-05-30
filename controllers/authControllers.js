@@ -45,7 +45,7 @@ export const register = async (req, res, next) => {
       from: "zubr7333@gmail.com",
       subject: "Сonfirm your registration",
       html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click to confirm your registration</a>`,
-      // text: `Сonfirm your registration please open href="http://localhost:8000/users/verify/${verificationToken}`,
+      text: `Сonfirm your registration please open href="http://localhost:8000/users/verify/${verificationToken}`,
     };
 
     mail.sendMail(verifyEmail);
@@ -172,6 +172,42 @@ export const verifyEmail = async (req, res, next) => {
 
     res.status(200).json({
       message: "Verification successful",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resendVerify = async (req, res, next) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (user.verify) {
+      return res
+        .status(400)
+        .json({ message: "Verification has already been passed" });
+    }
+
+    const verifyEmail = {
+      to: email,
+      from: "zubr7333@gmail.com",
+      subject: "Сonfirm your registration",
+      html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click to confirm your registration</a>`,
+      text: `Сonfirm your registration please open href="http://localhost:8000/users/verify/${verificationToken}`,
+    };
+
+    mail.sendMail(verifyEmail);
+
+    res.status(200).json({
+      message: "Verification email sent",
     });
   } catch (error) {
     next(error);
