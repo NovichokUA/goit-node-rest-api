@@ -6,6 +6,7 @@ import {
   logout,
   register,
   updateAvatar,
+  verifyEmail,
 } from "../controllers/authControllers.js";
 
 import validateBody from "../helpers/validateBody.js";
@@ -32,5 +33,7 @@ authRouter.post("/logout", auth, logout);
 authRouter.get("/current", auth, getCurrentUser);
 
 authRouter.patch("/avatars", auth, upload.single("avatar"), updateAvatar);
+
+authRouter.get("/verify/:verificationToken", verifyEmail);
 
 export default authRouter;

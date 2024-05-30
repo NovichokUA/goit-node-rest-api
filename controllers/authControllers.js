@@ -6,7 +6,7 @@ import { getGlobals } from "common-es";
 import * as path from "path";
 import * as fs from "fs/promises";
 import Jimp from "jimp";
-import HttpError from "../helpers/HttpError.js";
+// import HttpError from "../helpers/HttpError.js";
 import { randomUUID } from "crypto";
 import mail from "../mail.js";
 
@@ -151,4 +151,29 @@ export const updateAvatar = async (req, res) => {
   res.status(200).json({
     avatarURL,
   });
+};
+
+export const verifyEmail = async (req, res, next) => {
+  const { verificationToken } = req.params;
+
+  try {
+    const user = await User.findOne({ verificationToken });
+
+    if (user === null) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    await User.findByIdAndUpdate(user._id, {
+      verify: true,
+      verificationToken: null,
+    });
+
+    res.status(200).json({
+      message: "Verification successful",
+    });
+  } catch (error) {
+    next(error);
+  }
 };
