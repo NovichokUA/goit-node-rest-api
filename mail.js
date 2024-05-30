@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import "dotenv/config";
 
 const { MAILTRAP_USERNAME, MAILTRAP_PASSWORD } = process.env;
 
