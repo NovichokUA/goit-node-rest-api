@@ -201,7 +201,7 @@ export const resendVerify = async (req, res, next) => {
       to: email,
       from: "zubr7333@gmail.com",
       subject: "Сonfirm your registration",
-      html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click to confirm your registration</a>`,
+      html: `<a target="_blank" href="${BASE_URL}/users/verify/${user.verificationToken}">Click to confirm your registration</a>`,
       text: `Сonfirm your registration please open href="http://localhost:8000/users/verify/${verificationToken}`,
     };
 
