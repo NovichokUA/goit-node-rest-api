@@ -15,7 +15,7 @@ const { __dirname } = getGlobals(import.meta.url);
 const avatarDir = path.join(__dirname, "../", "public", "avatars");
 
 export const register = async (req, res, next) => {
-  const { META_USERNAME, BASE_URL } = process.env;
+  const { BASE_URL } = process.env;
 
   const { email, password } = req.body;
 
@@ -180,6 +180,7 @@ export const verifyEmail = async (req, res, next) => {
 
 export const resendVerify = async (req, res, next) => {
   const { email } = req.body;
+  const { BASE_URL } = process.env;
 
   try {
     const user = await User.findOne({ email });
